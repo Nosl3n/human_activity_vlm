@@ -22,7 +22,7 @@ def formatear_tiempo(milisegundos):
 
 def main():
     # --- CONFIGURACIÓN ---
-    video_name = "agriculture.mp4" 
+    video_name = os.path.expanduser("~/Documentos/Repositorios/Video_HAVLM/agriculture.mp4")
     log_name = "registro_actividades.txt"
 
     if not os.path.exists(video_name):

@@ -45,6 +45,8 @@ pip install --upgrade pip
 # Instalar las librerías esenciales para la cámara y el VLM
 pip install opencv-contrib-python-headless ollama
 ```
+sudo apt update
+sudo apt install libgtk-3-0 libgtk2.0-0 pkg-config
 
 ### 4. Instalar Ollama
 
@@ -100,6 +102,6 @@ Las advertencias `QFontDatabase: Cannot find font directory` son comunes al usar
 **Solución:**
 
 ```bash
-pip uninstall opencv-python -y
+pip install opencv-python
 pip install opencv-contrib-python-headless
 ```

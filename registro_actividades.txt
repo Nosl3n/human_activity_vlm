@@ -1,27 +1,27 @@
---- REGISTRO DE ACTIVIDADES (VLM) ---
-Video: agriculture.mp4
-Tiempo | Actividad (Max 2 palabras) | Tiempo Respuesta (ms)
-------------------------------------------------------------
-00:00:00 | Sin actividad | 823.6ms
-00:00:03 | La imagen | 1283.6ms
-00:00:06 | 'Sin actividad' | 810.8ms
-00:00:09 | Sin actividad. | 755.6ms
-00:00:12 | Sin actividad | 745.1ms
-00:00:15 | Trabajo en | 817.2ms
-00:00:18 | Trabajando | 745.6ms
-00:00:21 | Desculpe, não | 1107.3ms
-00:00:24 | Sin actividad | 721.3ms
-00:00:27 | Trabajo | 718.3ms
-00:00:30 | Sin actividad | 725.5ms
-00:00:33 | Sin actividad | 754.8ms
-00:00:36 | Sin actividad. | 735.6ms
-00:00:39 | Sin actividad. | 719.7ms
-00:00:42 | Trabajo | 683.3ms
-00:00:45 | Sin actividad | 738.4ms
-00:00:48 | Trabajando en | 775.3ms
-00:00:51 | Trabajando en | 787.7ms
-00:00:54 | La imagen | 1910.6ms
-00:00:57 | Trabajo de | 738.6ms
-00:01:00 | Sin actividad | 728.5ms
-00:01:03 | Sin actividad. | 741.7ms
-00:01:06 | Solo una | 2054.0ms
+--- REGISTRO DE ACTIVIDADES HUMANAS (VLM) ---
+Video procesado: /home/nosl3n/Documentos/Repositorios/Video_HAVLM/agriculture.mp4
+Tiempo (hh:mm:ss) | Actividad Detectada
+-----------------------------------------
+00:00:00 | La imagen muestra una escena de agricultura, con varios individuos trabajando en los campos. Algunas personas están sentadas, posiblemente supervisando o participando en la tarea de laboreo agrícola. Se pueden ver las herramientas agrícolas comunes, como rastrillos y hoces, así como vehículos que suelen ser tractores para ayudar en el trabajo del campo. La actividad humana central de la escena es la laboreo agrícola.
+00:00:03 | En esta imagen, se ve una actividad humana orientada a la agricultura, en la cual un trabajador está inspectando las uvas en un campo de viñas. El individuo está usando guantes y una máscara, lo que sugiere que está trabajando con un producto agrícola.
+00:00:06 | La imagen muestra a varios trabajadores en una planta de cultivo en un entorno rural. Estos trabajadores están recolectando plantas verdes y llevan los cuidados de protección para las manos, como guantes de plástico. La actividad humana orientada a la agricultura en esta imagen es "Recogiendo plantas".
+00:00:09 | Manual aparador en orchard de manzanas
+00:00:12 | El hombre está cargando cestos de limones en una operación agrícola, tal vez para transportar los frutos.
+00:00:15 | En la imagen, se observan varios trabajadores agricultores colocando tomates en un sistema de transporte mecánico.
+00:00:18 | Trabajando en una huerta
+00:00:21 | Person is cutting vegetables in a garden.
+00:00:24 | Tending to crops in field
+00:00:27 | Trabajando en campos de cultivo
+00:00:30 | Campañeros trabajando en una campaña de cultivo
+00:00:33 | Cultivando jardín.
+00:00:36 | 'Harvesting green plants in field'
+00:00:39 | Man working with greens, farm environment
+00:00:42 | La imagen muestra a tres personas trabajando en una parcela de cultivos. Estas personas parecen estar cosechando, lo que significa recolectar el producto de las plantas para su uso o venta.
+00:00:45 | "Cultivando plantas, tres personas trabajan"
+00:00:48 | Humans tending to crops in a field, working together as a group.
+00:00:51 | 'Tres personas cultivando campos'
+00:00:54 | Farmers planting crops in field.
+00:00:57 | Analizando la imagen, se observan varios trabajadores en una huerta o cultivar. La actividad humana orientada a la agricultura es: 'Trabajando en la tierra', 'Cosechando en las plantas'
+00:01:00 | La imagen muestra a una persona trabajando en una tienda de comestibles. Se puede ver que está arranqueando o deshaciendo productos vegetales, posiblemente para su venta.
+00:01:03 | Actividad humana en la agricultura: 'Limpieza de vegetales'
+00:01:06 | 'Campesinos cultivando verduras'

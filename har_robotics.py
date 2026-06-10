@@ -13,7 +13,7 @@ SYSTEM_PROMPT = (
 
 def main():
     # 2. Inicializar la cámara web de la laptop (Índice 1 según tu configuración)
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Error: No se pudo acceder a la cámara web.")
         return
