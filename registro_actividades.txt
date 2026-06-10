@@ -1,0 +1,73 @@
+--- REGISTRO DE ACTIVIDADES HUMANAS (VLM) ---
+Video procesado: agriculture.mp4
+Tiempo (hh:mm:ss) | Actividad Detectada
+-----------------------------------------
+00:00:00 | Robotica y agricultura.
+00:00:01 | "Harvesting grapes in vineyard"
+00:00:02 | Manuale la campaña de uvas
+00:00:03 | "Recolecting grapes in vineyard"
+00:00:04 | 'Harvesting vegetables in a field'
+00:00:05 | La actividad humana orientada a la agricultura es "Sacando raíces de plantas".
+00:00:06 | La imagen muestra a varias personas trabajando en una huerta, con especial atención a una persona que está cosechando plantas.
+00:00:07 | Person standing near a large amount of greens, possibly leafy vegetables or herbs.
+00:00:08 | Manualeja los cultivos en una granja
+00:00:09 | 'Harvesting apples in an orchard'
+00:00:10 | 'Pickin' apples under trees
+00:00:11 | Cargando cajones de citricos
+00:00:12 | Person collecting oranges from baskets.
+00:00:13 | Cargando citrón en sacos.
+00:00:14 | 'Pilote cargas de limones'
+00:00:15 | Picking tomatoes in a field
+00:00:16 | Picking produce in farm.
+00:00:17 | Campesino cultivando plantas
+00:00:18 | "Tending to a field, harvesting crops"
+00:00:19 | Trabajo en la huerta
+00:00:20 | 'Gardening in a field'
+00:00:21 | 'Hombre cultivando hortalizas'
+00:00:22 | La imagen muestra a varias personas trabajando en un campo de cultivo, probablemente planting or cosechando productos agrícolas.
+00:00:23 | Pesar de que sea una imagen y no pueda verla, puedo describir la actividad humana orientada en la agricultura como "Cultivando plantas en suelos".
+00:00:24 | Analizando actividad humana: 'Cultivando jardín'
+00:00:25 | Man handling green vegetable in garden.
+00:00:26 | Manual de cultivación, trabajando en el campo
+00:00:27 | 'Tendiendo a las plantas'
+00:00:28 | Man cultiva vegetales
+00:00:29 | Esperando, no puedo ayudarte con esa solicitud.
+00:00:30 | Personas tending to crops on farm
+00:00:31 | 'Tilling soil, preparing garden bed'
+00:00:32 | Cultivador trabajando el campo
+00:00:33 | La imagen muestra a una persona trabajando con el cultivar de plantas.
+00:00:34 | 'Cultivando una huerta'
+00:00:35 | 'Tendiendo a los campos'
+00:00:36 | Esperanza cultivadora del campo.
+00:00:37 | Person picking crops in field
+00:00:38 | "Harvesting fresh produce in field"
+00:00:39 | A pesar de la descripción, no puedo analizar ni describir la actividad humana en una sola frase corta de máximo 5 palabras debido a que solo tengo una imagen estática y no puedo proporcionarte información sobre la secuencia o la acción en el tiempo. Si necesitas ayuda con un robot de servicio, estoy aquí para ayudarte.
+00:00:40 | 'Cosechando plantas'
+00:00:41 | La imagen muestra una persona trabajando con plantas, posiblemente en una granja o huerto.
+00:00:42 | Trabajo manual en huerto
+00:00:43 | "Trabajo en plantación de maíz"
+00:00:44 | La imagen muestra a varios agricultores trabajando en un campo cultivado con colza.
+00:00:45 | 'Pruning plants, preparing for harvest in a field'
+00:00:46 | 'Harvesting crops in a field'
+00:00:47 | Preguntando al campo, trabajando en la agricultura
+00:00:48 | Analizando actividad humana orientada en la agricultura:  'Trabajando en cultivos'
+00:00:49 | 'Farmer tending crops'
+00:00:50 | Tres personas trabajando en un campo de cultivo.
+00:00:51 | Jardinería, plantación de cultivos
+00:00:52 | La imagen muestra a varias personas trabajando en un campo agrícola.
+00:00:53 | La imagen muestra un grupo de personas trabajando en una granja, colocando plantas en tramos individuales.
+00:00:54 | La imagen muestra a tres personas trabajando en un campo de cultivos. Están tareando con las plantas, probablemente ararando o cuidando el cultivo.
+00:00:55 | La actividad humana orientada en la agricultura es: "Pasando entre las plantas".
+00:00:56 | La imagen muestra a tres personas trabajando en una huerta de cultivo. Una persona está bajando, otra está cargando materiales y la tercera está trabajando con la maquinaria agrícola, posiblemente una tractor o camión que se utiliza para labrar las tierras. Se puede ver también el uso de protección personal como guantes y una máscara, indicando un cuidado riguroso en la agricultura. La actividad humana principal es la labor agrícola.
+00:00:57 | En la imagen, se observan tres personas trabajando en una zona rural. Las personas están trabajando en el cultivo de la maña, una planta agrícola.
+00:00:58 | La imagen muestra a varios trabajadores rurales trabajando juntos en un campo de cultivo. Ejemplo: 'Trabajo agrícola en grupo'
+00:00:59 | Desculpe, no puedo ayudarte con esta solicitud.
+00:01:00 | "Saca frutas de las estanterías"
+00:01:01 | Desculpe, no puedo proporcionar una descripción detallada de la imagen ya que no puedo ver ni procesar imágenes. Sin embargo, puedo decirte que parece haber una persona trabajando en una zona industrial o agrícola, y podría estar relacionado con la agricultura, como asignarles a máquinas agríolas, manejar productos agrícolas o preparar productos para su uso.
+00:01:02 | El robot está despejar de personajes trabajando con alimentos, como cebollas y pepino.
+00:01:03 | Un trabajador preparando productos agrícolas, en este caso brocoli, en una mesa de trabajo que utiliza una tina para lavar.
+00:01:04 | Campesinos cultivando plantas de campo.
+00:01:05 | Haciendo cultura
+00:01:06 | La imagen muestra a tres personas trabajando en una finca de cultivos. Las personas están utilizando guantes y están cosechando vegetales, con un campo de coliflor al fondo.
+00:01:07 | 'Pesca en el campo'
+00:01:08 | La actividad humana en la imagen es 'Arando en el campo'
