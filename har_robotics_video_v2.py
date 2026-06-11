@@ -5,12 +5,10 @@ import time
 
 # 1. Configurar el prompt del sistema (Instrucciones estrictas)
 SYSTEM_PROMPT = (
-    "Eres un sistema de percepción visual estricto. Analiza la imagen y responde "
-    "EXACTAMENTE con DOS palabras que describan la acción principal. "
-    "No uses frases, ni puntos, ni explicaciones. "
-    "Ejemplos válidos: 'Si esta realacionado con trabajar en un entorno de agricultura'. "
-    "Si no hay actividad clara, di: 'Sin actividad'."
-)
+    "Eres un sistema de percepción de robots agrícolas. Analiza la imagen y genera un reporte breve en una sola línea con el siguiente formato: "
+    "'ESTADO: [Activo/Inactivo/Pausa] | TAREA: [Descripción de 3-5 palabras] | PERSONAS: [Número] | HERRAMIENTAS: [Lista breve]'. "
+    "Si no hay actividad agrícola, reporta 'ESTADO: Inactivo'. No agregues texto introductorio ni explicaciones adicionales."
+)   
 
 def formatear_tiempo(milisegundos):
     """Convierte milisegundos a formato hh:mm:ss"""
@@ -22,7 +20,8 @@ def formatear_tiempo(milisegundos):
 
 def main():
     # --- CONFIGURACIÓN ---
-    video_name = os.path.expanduser("~/Documentos/Repositorios/Video_HAVLM/agriculture.mp4")
+    #video_name = os.path.expanduser("~/Documentos/Repositorios/Video_HAVLM/agriculture.mp4")
+    video_name = os.path.expanduser("~/Doctorado/videos_HAR/agriculture.mp4")
     log_name = "registro_actividades.txt"
 
     if not os.path.exists(video_name):
@@ -110,12 +109,7 @@ def main():
         # Dibujar texto con tiempo de respuesta
         texto_superior = f"ACTIVIDAD: {actividad_detectada}"
         texto_inferior = f"Tiempo Respuesta: {last_response_time_ms:.0f}ms"
-        
-        cv2.putText(frame_resized, texto_superior, (20, 60), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2, cv2.LINE_AA)
-        cv2.putText(frame_resized, texto_inferior, (20, 100), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2, cv2.LINE_AA)
-        
+            
         cv2.imshow("Procesando Video", frame_resized)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

@@ -1,75 +1,113 @@
 import cv2
 import ollama
 import time
-import os
+import threading
+import queue
 
-# 1. Configurar el prompt del sistema (Instrucciones estrictas para el VLM)
 SYSTEM_PROMPT = (
-    "Eres el sistema de percepción visual de un robot de servicio. Tu tarea es analizar la "
-    "imagen y describir la actividad humana principal en una sola frase corta de máximo 5 palabras. "
-    "Sé directo y objetivo. Ejemplos: 'Caminando hacia la salida', 'Escribiendo en la laptop', "
-    "'Bebiendo agua', 'Manipulando un objeto'."
-)
+    "Eres un sistema de percepción de robots agrícolas. Analiza la imagen y genera un reporte breve en una sola línea con el siguiente formato: "
+    "'ESTADO: [Activo/Inactivo/Pausa] | TAREA: [Descripción de 3-5 palabras] | PERSONAS: [Número] | HERRAMIENTAS: [Lista breve]'. "
+    "Si no hay actividad agrícola, reporta 'ESTADO: Inactivo'. No agregues texto introductorio ni explicaciones adicionales."
+)   
 
-def main():
-    # 2. Inicializar la cámara web de la laptop (Índice 1 según tu configuración)
-    cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        print("Error: No se pudo acceder a la cámara web.")
-        return
+USE_GUI = True
 
-    print("Sistema HAR iniciado. Presiona 'q' para salir.")
-    last_inference_time = time.time()
-    actividad_detectada = "Inicializando..."
+# Cola para frames
+frame_queue = queue.Queue(maxsize=1)
+
+# Variable compartida
+actividad_detectada = "..."
+
+
+def thread_camara(cap):
+    """Captura frames continuamente"""
+    global frame_queue
 
     while True:
         ret, frame = cap.read()
+
         if not ret:
-            break
+            print("[ERROR] Frame inválido")
+            continue
 
-        current_time = time.time()
-        
-        # 3. Controlar la tasa de refresco (Inferencia cada 3 segundos)
-        if current_time - last_inference_time > 3.0:
-            # Guardar temporalmente el frame actual como imagen
-            img_path = "current_frame.jpg"
-            cv2.imwrite(img_path, frame)
-            
+        # Mantener solo el frame más reciente
+        if not frame_queue.empty():
             try:
-                # 4. Enviar la imagen y el prompt a Ollama
-                response = ollama.generate(
-                    model='llava',
-                    prompt=SYSTEM_PROMPT,
-                    images=[img_path]
-                )
-                actividad_detectada = response['response'].strip()
-                print(f"[LOG Robot]: Actividad detectada -> {actividad_detectada}")
-                
-            except Exception as e:
-                actividad_detectada = f"Error en inferencia: {e}"
-                print(f"[ERROR VLM]: {e}")
-            
-            # --- CORRECCIÓN AQUÍ ---
-            # Se usa os.remove() directamente, que es la función correcta del sistema de archivos.
-            if os.path.exists(img_path):
-                os.remove(img_path)
-                
-            last_inference_time = current_time
+                frame_queue.get_nowait()
+            except:
+                pass
 
-        # 5. Visualización: Mostrar el resultado sobre el video en tiempo real
-        cv2.putText(frame, f"ACTIVIDAD: {actividad_detectada}", (20, 50), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2, cv2.LINE_AA)
-        
-        cv2.imshow("Robot Perception - Human Activity Recognition", frame)
+        frame_queue.put(frame)
 
-        # Salir con la tecla 'q'
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
 
-    # Cierre seguro de recursos para evitar errores de ioctl / Bad file descriptor
-    cap.release()
-    cv2.destroyAllWindows()
-    print("Sistema HAR cerrado correctamente.")
+def thread_ia():
+    """Inferencia con Ollama sin bloquear cámara"""
+    global actividad_detectada
+
+    while True:
+        try:
+            if frame_queue.empty():
+                time.sleep(0.1)
+                continue
+
+            frame = frame_queue.get()
+
+            # 🔥 CLAVE: codificar imagen en memoria (NO disco)
+            _, buffer = cv2.imencode('.jpg', frame)
+
+            response = ollama.generate(
+                model='llava',
+                prompt=SYSTEM_PROMPT,
+                images=[buffer.tobytes()]  # ✅ sin archivo
+            )
+
+            actividad_detectada = response.get('response', 'Sin respuesta').strip()
+            print(f"[IA]: {actividad_detectada}")
+
+            time.sleep(3)  # control de frecuencia
+
+        except Exception as e:
+            print(f"[ERROR IA]: {e}")
+            actividad_detectada = "Error IA"
+
+
+def main():
+    cap = cv2.VideoCapture(0)
+
+    if not cap.isOpened():
+        print("[ERROR] No se pudo abrir cámara")
+        return
+
+    # Threads
+    t_cam = threading.Thread(target=thread_camara, args=(cap,), daemon=True)
+    t_ai = threading.Thread(target=thread_ia, daemon=True)
+
+    t_cam.start()
+    t_ai.start()
+
+    print("Sistema HAR PRO iniciado")
+
+    try:
+        while True:
+            if frame_queue.empty():
+                continue
+
+            frame = frame_queue.queue[0]  # último frame
+
+            texto = f"ACTIVIDAD: {actividad_detectada[:50]}"
+
+            if USE_GUI:
+                cv2.imshow("HAR PRO", frame)
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+
+    except KeyboardInterrupt:
+        print("\n[INFO] Interrupción manual")
+
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     main()

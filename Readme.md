@@ -9,22 +9,25 @@ Proyecto de reconocimiento de actividades humanas usando Vision Language Models 
 - Acceso a terminal/línea de comandos
 - Conexión a internet para descargar modelos
 
-## Instalación
+## Guía de Instalación
 
-### 1. Instalar Herramientas de Entorno Virtual (Ubuntu)
+Sigue estos pasos en orden para configurar el proyecto correctamente.
+
+### Paso 1: Instalar Herramientas del Sistema (Ubuntu)
 
 Ubuntu bloquea la instalación global de paquetes Pip (PEP 668). Instala las herramientas necesarias:
 
 ```bash
 sudo apt update
 sudo apt install python3-venv python3-pip -y
+sudo apt install libgtk2.0-dev pkg-config
+sudo apt install libgtk-3-0 libgtk2.0-0
 ```
 
-### 2. Crear el Entorno Virtual
+### Paso 2: Crear el Entorno Virtual
 
 ```bash
-mkdir ~/har_robotics_project
-cd ~/har_robotics_project
+# Crear el entorno virtual
 python3 -m venv vlm_env
 
 # Activar el entorno virtual
@@ -34,7 +37,7 @@ source vlm_env/bin/activate
 deactivate
 ```
 
-### 3. Actualizar pip e Instalar Dependencias
+### Paso 3: Actualizar pip e Instalar Dependencias de Python
 
 Dentro del entorno virtual activado:
 
@@ -43,12 +46,12 @@ Dentro del entorno virtual activado:
 pip install --upgrade pip
 
 # Instalar las librerías esenciales para la cámara y el VLM
-pip install opencv-contrib-python-headless ollama
+pip install opencv-python
+pip install opencv-contrib-python-headless
+pip install ollama
 ```
-sudo apt update
-sudo apt install libgtk-3-0 libgtk2.0-0 pkg-config
 
-### 4. Instalar Ollama
+### Paso 4: Instalar Ollama
 
 Descarga e instala Ollama desde: https://ollama.com/library/llava
 
@@ -57,7 +60,7 @@ Descarga e instala Ollama desde: https://ollama.com/library/llava
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-### 5. Configurar el Servicio de Ollama
+### Paso 5: Configurar el Servicio de Ollama
 
 ```bash
 # Iniciar el servicio de Ollama
@@ -67,7 +70,7 @@ sudo systemctl start ollama
 sudo systemctl enable ollama
 ```
 
-### 6. Verificar la Instalación
+### Paso 6: Verificar la Instalación
 
 ```bash
 # Verificar el estado del servicio
@@ -80,28 +83,76 @@ ollama pull llava
 ollama list
 ```
 
-## Uso
+## Ejecución del Proyecto
 
 Una vez completada la instalación y con el servicio de Ollama ejecutándose:
 
 ```bash
-# Asegúrate de estar en el directorio del proyecto y el entorno activado
-cd ~/har_robotics_project
+# Activar el entorno virtual
 source vlm_env/bin/activate
+
+# Asegúrate de estar en el directorio del proyecto
+cd ~/har_robotics_project
 
 # Ejecutar el script
 python3 har_robotics.py
 ```
 
-## Solución de Problemas
+## Prueba con CLIP
 
-### Advertencias de QFontDatabase (OpenCV en Ubuntu)
-
-Las advertencias `QFontDatabase: Cannot find font directory` son comunes al usar OpenCV en entornos virtuales en Ubuntu 24. No afectan la ejecución del programa pero ensucian los logs.
-
-**Solución:**
+### Paso 1: Añadir Repositorio de Python
 
 ```bash
-pip install opencv-python
-pip install opencv-contrib-python-headless
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:deadsnakes/ppa
+```
+
+### Paso 2: Actualizar Sistema
+
+```bash
+sudo apt update
+```
+
+### Paso 3: Instalar Python 3.10
+
+```bash
+sudo apt install python3.10 python3.10-venv
+```
+
+Verificar la instalación:
+
+```bash
+python3.10 --version
+```
+
+Debería mostrar: `Python 3.10.x`
+
+### Paso 4: Crear Entorno Virtual para CLIP
+
+```bash
+python3.10 -m venv clip_gpu_env
+source clip_gpu_env/bin/activate
+```
+
+### Paso 5: Instalar PyTorch Compatible con GPU
+
+```bash
+pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 --index-url https://download.pytorch.org/whl/cu116
+```
+
+### Paso 6: Instalar Dependencias de Transformers
+
+Para esta versión de Python y PyTorch:
+
+```bash
+pip install transformers==4.30.2
+pip install accelerate==0.20.3
+pip install "numpy<2"
+```
+
+### Paso 7: Instalar Transformers y Herramientas Adicionales
+
+```bash
+pip install torch torchvision transformers
 ```

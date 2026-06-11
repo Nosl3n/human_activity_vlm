@@ -5,11 +5,10 @@ import time
 
 # 1. Configurar el prompt del sistema (Instrucciones estrictas para el VLM)
 SYSTEM_PROMPT = (
-    "Eres el sistema de percepción visual de un robot de servicio. Tu tarea es analizar la "
-    "imagen y describir la actividad humana orientada en la agricultura en una sola frase corta de máximo 5 palabras. "
-    "Sé directo y objetivo. Ejemplos: 'Caminando hacia la salida', 'Escribiendo en la laptop', "
-    "'Bebiendo agua', 'Manipulando un objeto'."
-)
+    "Eres un sistema de percepción de robots agrícolas. Analiza la imagen y genera un reporte breve en una sola línea con el siguiente formato: "
+    "'ESTADO: [Activo/Inactivo/Pausa] | TAREA: [Descripción de 3-5 palabras] | PERSONAS: [Número] | HERRAMIENTAS: [Lista breve]'. "
+    "Si no hay actividad agrícola, reporta 'ESTADO: Inactivo'. No agregues texto introductorio ni explicaciones adicionales."
+)   
 
 def formatear_tiempo(milisegundos):
     """Convierte milisegundos a formato hh:mm:ss"""
@@ -22,7 +21,8 @@ def formatear_tiempo(milisegundos):
 def main():
     # --- CONFIGURACIÓN ---
     # Coloca aquí el nombre exacto de tu video (debe estar en la misma carpeta)
-    video_name = os.path.expanduser("~/Documentos/Repositorios/Video_HAVLM/agriculture.mp4")
+    #video_name = os.path.expanduser("~/Documentos/Repositorios/Video_HAVLM/agriculture.mp4")
+    video_name = os.path.expanduser("~/Doctorado/videos_HAR/agriculture.mp4")
     log_name = "registro_actividades.txt"
 
     if not os.path.exists(video_name):
@@ -98,9 +98,7 @@ def main():
             frame_resized = frame
 
         # Dibujar la última actividad detectada sobre el reproductor de video
-        cv2.putText(frame_resized, f"ACTIVIDAD: {actividad_detectada}", (20, 50), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2, cv2.LINE_AA)
-        
+            
         cv2.imshow("Procesando Video - Human Activity Recognition", frame_resized)
 
         # Cancelar con la tecla 'q'
