@@ -2,14 +2,17 @@ import cv2
 import torch
 from transformers import CLIPProcessor, CLIPModel
 from PIL import Image
+import time
 
 # ---------------- CONFIG ----------------
 FRAME_INTERVAL = 30
 
 labels = [
-    "hay una gorra",
-    "hay un vaso",
-    "hay unas llaves"
+    "hay una agenda roja",
+    "hay un Ipad azul",
+    "hay una billetara negra",
+    "hay un a agenda gris",
+    "hay un boligrafo azul"
 ]
 
 # ---------------- MODEL ----------------
@@ -37,7 +40,6 @@ try:
             print("[ERROR] No se pudo leer frame")
             break
 
-        # 🔥 AQUÍ MUESTRAS LA IMAGEN
         cv2.imshow("Camara", frame)
 
         # Inferencia cada N frames
@@ -52,16 +54,22 @@ try:
                 padding=True
             ).to(device)
 
+            
+            start_time = time.time()
+
             with torch.no_grad():
                 outputs = model(**inputs)
                 logits = outputs.logits_per_image
                 probs = logits.softmax(dim=1)
 
+            end_time = time.time()
+            inference_time = end_time - start_time
+
+
             best_idx = probs.argmax().item()
             confidence = probs[0][best_idx].item()
 
-            
-            print(f"\n[FRAME {segment_id}]")
+            print(f"\n[FRAME {segment_id}] (Inference Time: {inference_time:.3f}s)")
 
             for i, label in enumerate(labels):
                 conf = probs[0][i].item()

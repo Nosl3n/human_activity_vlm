@@ -156,3 +156,35 @@ pip install "numpy<2"
 ```bash
 pip install torch torchvision transformers
 ```
+## IMPLEMNETACION DE YOLO
+
+### Paso 1:instalar YOLOv5s + ByteTrack
+
+pip install typeguard
+pip install opencv-python
+pip install ultralytics
+
+problemas con la version de pytorch: Tu GPU (GTX 1080 Ti → arquitectura Pascal, compute capability 6.1)
+
+OPCIÓN 1 — Ejecutar en CPU (rápido de probar)
+
+results = model.track(
+    source=frame,
+    persist=True,
+    device="cpu"
+)
+
+Instalar PyTorch compatible con tu GPU
+
+pip uninstall torch torchvision torchaudio 
+pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu118
+
+Luego instalar la version correcta de numpy
+pip install "numpy<2.0"
+
+LUEGO SE PROCEDE A INSTALAR MOVENET PARA LA POSE
+
+Instalar MoveNet
+
+pip install tensorflow tensorflow-hub
+
