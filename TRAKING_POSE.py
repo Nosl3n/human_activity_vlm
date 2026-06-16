@@ -1,3 +1,4 @@
+import os
 from ultralytics import YOLO
 import cv2
 import numpy as np
@@ -11,9 +12,9 @@ movenet = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
 movenet = movenet.signatures['serving_default']
 
 def get_pose(img):
-    img = cv2.resize(img, (192, 192))
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    input_img = np.expand_dims(img, axis=0)
+    img_resized = cv2.resize(img, (192, 192))
+    img_resized = cv2.cvtColor(img_resized, cv2.COLOR_BGR2RGB)
+    input_img = np.expand_dims(img_resized, axis=0)
     input_img = tf.cast(input_img, dtype=tf.int32)
 
     outputs = movenet(input_img)
@@ -34,14 +35,16 @@ EDGES = [
 # YOLO
 # ==============================
 model = YOLO("yolov8s.pt")
-
-cap = cv2.VideoCapture(0)
+video_name = os.path.expanduser("~/Doctorado/videos_HAR/recolectando.mp4")
+cap = cv2.VideoCapture(video_name)
+#cap = cv2.VideoCapture(0)
 
 while True:
     ret, frame = cap.read()
     if not ret:
         break
 
+    # === TRACKING (solo visual)
     results = model.track(
         source=frame,
         persist=True,
@@ -49,69 +52,42 @@ while True:
         classes=[0]
     )
 
-    # 👇 TU visualización base
     annotated_frame = results[0].plot()
 
     # ==============================
-    # AÑADIMOS POSE SOBRE annotated_frame
+    # POSE SOBRE TODA LA IMAGEN
     # ==============================
-    if results[0].boxes.id is not None:
+    keypoints = get_pose(frame)
+    kp = keypoints[0][0]  # (17,3)
 
-        boxes = results[0].boxes.xyxy.cpu().numpy()
-        ids = results[0].boxes.id.cpu().numpy().astype(int)
+    h, w, _ = frame.shape
+    keypoints_px = []
 
-        for box, track_id in zip(boxes, ids):
+    for k in kp:
+        ky, kx, conf = k
+        px = int(kx * w)
+        py = int(ky * h)
+        keypoints_px.append((px, py, conf))
 
-            x1, y1, x2, y2 = map(int, box)
+    # ==============================
+    # DIBUJAR KEYPOINTS
+    # ==============================
+    for (px, py, conf) in keypoints_px:
+        if conf > 0.3:
+            cv2.circle(annotated_frame, (px, py), 4, (0, 0, 255), -1)
 
-            # Expandir bounding box
-            margin = 0.2
-            w = x2 - x1
-            h = y2 - y1
+    # ==============================
+    # DIBUJAR ESQUELETO
+    # ==============================
+    for e in EDGES:
+        p1 = keypoints_px[e[0]]
+        p2 = keypoints_px[e[1]]
 
-            x1e = max(0, int(x1 - margin * w))
-            y1e = max(0, int(y1 - margin * h))
-            x2e = int(x2 + margin * w)
-            y2e = int(y2 + margin * h)
-
-            person_img = frame[y1e:y2e, x1e:x2e]
-
-            if person_img.shape[0] == 0 or person_img.shape[1] == 0:
-                continue
-
-            # ==============================
-            # POSE
-            # ==============================
-            keypoints = get_pose(person_img)
-            kp = keypoints[0][0]  # (17,3)
-
-            keypoints_px = []
-
-            for k in kp:
-                ky, kx, conf = k
-                px = int(kx * (x2e - x1e)) + x1e
-                py = int(ky * (y2e - y1e)) + y1e
-                keypoints_px.append((px, py, conf))
-
-            # ==============================
-            # DIBUJAR KEYPOINTS
-            # ==============================
-            for (px, py, conf) in keypoints_px:
-                if conf > 0.3:
-                    cv2.circle(annotated_frame, (px, py), 4, (0, 0, 255), -1)
-
-            # ==============================
-            # DIBUJAR ESQUELETO
-            # ==============================
-            for e in EDGES:
-                p1 = keypoints_px[e[0]]
-                p2 = keypoints_px[e[1]]
-
-                if p1[2] > 0.3 and p2[2] > 0.3:
-                    cv2.line(annotated_frame,
-                             (p1[0], p1[1]),
-                             (p2[0], p2[1]),
-                             (255, 0, 0), 2)
+        if p1[2] > 0.3 and p2[2] > 0.3:
+            cv2.line(annotated_frame,
+                     (p1[0], p1[1]),
+                     (p2[0], p2[1]),
+                     (255, 0, 0), 2)
 
     cv2.imshow("Tracking + Pose", annotated_frame)
 
