@@ -8,11 +8,14 @@ import time
 FRAME_INTERVAL = 30
 
 labels = [
-    "hay una agenda roja",
-    "hay un Ipad azul",
-    "hay una billetara negra",
-    "hay un a agenda gris",
-    "hay un boligrafo azul"
+    "Las personas estan trabajando",
+    "Una persona que esta trabajando",
+    "la persona esta caminando",
+    "las personas estan caminando",
+    "la persona esta parada",
+    "las personas estan paradas",
+    "la persona no esta trabajando",
+    "las personas no estan trabajando"
 ]
 
 # ---------------- MODEL ----------------

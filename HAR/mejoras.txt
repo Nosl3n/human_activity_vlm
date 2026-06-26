@@ -1,0 +1,166 @@
+MEJORAS AL PIPELINE RGB
+=======================
+Mediciones base (CPU, D=16 parámetros):
+  YOLO-pose imgsz=640 : ~65ms
+  YOLO-pose imgsz=320 : ~43ms     ← default actual
+  VFE gn_steps=2      : ~180-200ms
+  VFE gn_steps=1      : ~90-100ms ← default actual
+  Total (1 persona)   : ~135ms → ~7 FPS
+
+
+MEJORAS YA IMPLEMENTADAS (2025-06)
+====================================
+
+A) Rotación de hombros con Rodrigues (axis-angle)
+   Reemplaza matrices Euler (Ry·Rx·Rz) con la fórmula de Rodrigues.
+   Beneficios:
+   - Elimina gimbal lock en poses extremas de hombro.
+   - Gradientes suaves en todo el espacio de parámetros.
+   - Inicialización en cero = postura neutral exacta.
+   Impacto en tiempo: mínimo (<1ms diferencia).
+
+B) Tren inferior articulado (4 parámetros nuevos)
+   Añade flexión de cadera izq/der y rodilla izq/der (hip_L/R_flex, knee_L/R_flex).
+   Antes: bloque rígido inferior (solo traslación XZ + rotación Y).
+   Ahora: cada pierna puede flexionarse independientemente en el plano sagital.
+   Permite modelar caminar, agacharse, sentarse.
+   Parámetros totales: 11 → 16 (incluye log_s).
+   Impacto en tiempo: +10-15ms por paso GN (Jacobiano más grande: 16×M*3 vs 11×M*3).
+
+C) Factor de escala adaptativo (log_s)
+   El parámetro 15 del vector de estado ajusta el tamaño del esqueleto predicho
+   al sujeto real: kp_pred_scaled = kp_pred * exp(log_s).
+   Límites: log_s ∈ [-0.5, 0.5] → s ∈ [0.61, 1.65].
+   Elimina el error sistemático cuando la persona es notablemente más alta
+   o baja que la plantilla de 1.70 m.
+   Se reporta como scale=X.XXX en consola.
+
+D) Panel de visualización unificado
+   render_unified_panel() reemplaza render_multi_view() como función por defecto.
+   En vez de una fila por persona (ventana que crece verticalmente), muestra:
+   - Sub-panel izquierdo: todos los esqueletos observados solapados.
+   - Sub-panel derecho: todos los esqueletos predichos solapados.
+   - Cada persona con color distinto + leyenda con tracking ID.
+   La ventana tiene tamaño fijo independientemente del número de personas.
+
+E) Corrección de estabilidad numérica (kabsch_torch + GN update)
+   - kabsch_torch: retorna identidad + traslación de centroide si H no es finita.
+   - GN update: descarta delta si torch.linalg.solve produce NaN/Inf.
+   Previene crash con "linalg.svd: non-finite values" cuando mu se corrompe.
+
+F) Overlay del modelo VFE sobre la cámara (render_camera_overlay)
+   El esqueleto predicho se back-proyecta al espacio píxel de la cámara
+   usando la transformación inversa del lifting pseudo-3D:
+     px = pelvis_px[0] + x * ppm
+     py = pelvis_px[1] - y * ppm
+   Esto coloca el modelo directamente sobre la persona en la imagen real.
+   Ventana principal: "HAR — Modelo VFE sobre cámara".
+   Ventana de depuración: "HAR — YOLO-pose vs Modelo interno" (panel canónico).
+   La antigua ventana "RGB Tracking" fue eliminada (redundante con el overlay).
+   La tecla 'q'/ESC cierra el pipeline desde cualquiera de las dos ventanas.
+
+
+1. VELOCIDAD
+============
+
+A) Reducir imgsz de YOLO (ya implementado como --imgsz)
+   --imgsz 320  → ~43ms  (default actual)
+   --imgsz 256  → ~40ms  (mínimo útil, puede perder detecciones)
+   --imgsz 640  → ~65ms  (más preciso, más lento)
+
+B) Reducir gn_steps del VFE (ya implementado como --gn_steps)
+   gn_steps=1 → ~90-100ms (default, converge en múltiples frames)
+   gn_steps=2 → ~180-200ms (más preciso por frame)
+
+C) GPU (mayor salto posible)
+   python rgb_main.py --device cuda
+   YOLO imgsz=320 → ~5-8ms, VFE gn_steps=2 → ~15-25ms.
+   Total estimado: ~30ms → ~33 FPS.
+
+D) Saltar frames de VFE (no implementado)
+   Procesar VFE cada 2 frames; mantener predicción en frames intermedios.
+   Código aproximado en rgb_main.py:
+     if frame_idx % 2 == 0:
+         res = estimators[tid].infer(live, kp_conf_np=kp_conf)
+         last_res[tid] = res
+     else:
+         res = last_res.get(tid)
+
+E) Compilar el modelo cinemático con torch.compile() (PyTorch >= 2.0)
+   En vfe_inference.py, en __init__:
+     self.model = torch.compile(model)
+   Overhead inicial ~10-30s; después 20-40% speedup en CPU.
+
+
+2. MULTI-PERSONA
+================
+
+Estado actual:
+  - YOLO detecta todas las personas en una pasada.
+  - Cada persona tiene su propio estimador (mu (16,), Lambda (16,16)).
+  - render_unified_panel muestra todas en una sola ventana.
+
+Limitación con escalas distintas:
+  El log_s se optimiza por persona (está en el vector mu de cada estimador),
+  así que una persona alta y una baja deberían converger a escalas distintas
+  con suficientes frames. Para convergencia más rápida, inicializar log_s
+  con una estimación del bbox_height:
+    log_s_init = np.log(bbox_height_px / (ppm * 1.70))
+
+Oclusión entre personas:
+  Con bytetrack (default) es estable. Alternativa con re-identificación visual:
+    python rgb_main.py --tracker botsort.yaml
+
+Número máximo de personas:
+  Sin límite en código. Cada persona agrega ~90ms de VFE en CPU.
+  En GPU con 3 personas: ~8ms YOLO + 3×20ms VFE = ~68ms → ~15 FPS.
+
+
+3. PROFUNDIDAD (Z=0)
+====================
+
+Limitación fundamental: todos los joints tienen Z=0 (cámara monocular).
+El modelo no puede distinguir brazo adelante vs atrás.
+
+Opciones (menor a mayor esfuerzo):
+
+A) DepthAnything v2 (monocular depth, sin hardware extra)
+   pip install transformers
+   Tiempo adicional: ~30-50ms CPU / ~5ms GPU.
+   Da profundidad relativa (sin escala absoluta), útil para disambiguar.
+
+B) Intel RealSense D435/D455 (~200-400 USD)
+   Da profundidad real en metros hasta 10m. Pipeline RGB se adapta
+   directamente: cambiar Z=0 por depth_frame.get_distance(px, py).
+
+C) Stereo RGB calibrado
+   OpenCV stereoRectify() + StereoBM/StereoSGBM.
+
+D) VideoPose3D / MotionBERT (lifting 2D→3D neuronal)
+   https://github.com/facebookresearch/VideoPose3D
+   Latencia inherente por ventana temporal (~27-243 frames).
+
+
+4. CALIDAD DE POSE
+==================
+
+A) Modelo YOLO más grande
+   yolov8s-pose.pt  (~11M params) → más preciso, ~2× más lento
+   yolov8m-pose.pt  (~26M params) → muy preciso, ~4× más lento
+   Cambiar en rgb_body_stream.py: _YOLO_POSE_MODEL = "yolov8s-pose.pt"
+
+B) Ajustar sigma_obs
+   Si keypoints YOLO son ruidosos: aumentar --sigma_obs 0.08 o 0.10
+   (más suavizado temporal, menos reactivo a ruido).
+
+C) Ajustar sigma_dyn
+   Si el estimador no sigue el movimiento: aumentar --sigma_dyn 0.35 o 0.50.
+
+D) Añadir rotación de cadera en el plano transversal (mejora futura)
+   Actualmente hip_L/R_flex solo cubre el plano sagital (eje X).
+   Para caminar se necesita también rotación en el plano frontal (eje Z)
+   y rotación axial (eje Y). Añadiría 4 parámetros más (D→20).
+
+E) Rotación de tobillo (mejora futura)
+   Un único parámetro de dorsi/plantar-flexión por pie mejoraría
+   la estimación de poses de squat y caminar. D→22.
